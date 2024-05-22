@@ -27,10 +27,9 @@ endif()
 # NOTE: нужен ли на MSVC?
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-#if (WIN32)
-#    add_compile_definitions(UNICODE)
-#    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-#endif()
+if (WIN32)
+#    add_compile_definitions(UNICODE) # TODO: хочу ли я использовать функции с W окончанием
+endif()
 
 if (MSVC)
     add_compile_options(
