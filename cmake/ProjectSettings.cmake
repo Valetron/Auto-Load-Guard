@@ -27,11 +27,11 @@ endif()
 # NOTE: нужен ли на MSVC?
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-if (WIN32)
-#    add_compile_definitions(UNICODE) # TODO: хочу ли я использовать функции с W окончанием
-endif()
+#add_compile_definitions(UNICODE) # TODO: хочу ли я использовать функции с W окончанием
+
 
 if (MSVC)
+# NOTE: https://cmake.org/cmake/help/latest/prop_tgt/COMMON_LANGUAGE_RUNTIME.html
     add_compile_options(
 #        /W4            # NOTE: это или Wall?
         /Wall

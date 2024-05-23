@@ -5,7 +5,7 @@
 // user folder - C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
 // all folder - C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp
 
-class AutoStartFolderGuard final : public IGuard
+class TaskSchedulerGuard final : public IGuard
 {
 public:
     AutoStartFolderGuard() = default;
