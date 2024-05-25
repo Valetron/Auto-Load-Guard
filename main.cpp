@@ -67,10 +67,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             "BUTTON",  // Predefined class; Unicode assumed
             "Button 1",      // Button text
             WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles
-            10,         // x position
-            10,         // y position
-            100,        // Button width
-            30,        // Button height
+            0, 0, 100, 30,   // Initial position and size
             hwnd,       // Parent window
             (HMENU)IDC_BUTTON1,       // No menu.
             (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE),
@@ -80,10 +77,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             "BUTTON",  // Predefined class; Unicode assumed
             "Button 2",      // Button text
             WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles
-            120,        // x position
-            10,         // y position
-            100,        // Button width
-            30,        // Button height
+            0, 0, 100, 30,   // Initial position and size
             hwnd,       // Parent window
             (HMENU)IDC_BUTTON2,       // No menu.
             (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE),
@@ -97,6 +91,34 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         InitListViewColumns(hwndListView);
 
         break;
+
+    case WM_SIZE:
+        if (wParam != SIZE_MINIMIZED) {
+            RECT rect;
+            GetClientRect(hwnd, &rect);
+
+            // Center the buttons horizontally
+            int buttonWidth = 100;
+            int buttonHeight = 30;
+            int buttonSpacing = 10;
+            int totalButtonWidth = (buttonWidth * 2) + buttonSpacing;
+            int xOffset = (rect.right - totalButtonWidth) / 2;
+
+            MoveWindow(hwndButton1, xOffset, 10, buttonWidth, buttonHeight, TRUE);
+            MoveWindow(hwndButton2, xOffset + buttonWidth + buttonSpacing, 10, buttonWidth, buttonHeight, TRUE);
+
+            // Resize the ListView
+            MoveWindow(hwndListView, 10, 50, rect.right - 20, rect.bottom - 60, TRUE);
+        }
+        break;
+
+    case WM_GETMINMAXINFO:
+    {
+        MINMAXINFO* mmi = (MINMAXINFO*)lParam;
+        mmi->ptMinTrackSize.x = 550; // Minimum width
+        mmi->ptMinTrackSize.y = 400; // Minimum height
+    }
+    break;
 
     case WM_COMMAND:
         switch (LOWORD(wParam)) {
