@@ -12,3 +12,4 @@ include(ProjectSettings)
 #file(GLOB HEADERS "*.hpp")
 
 add_executable(${PROJECT_NAME} main.cpp #[[${SOURCES} ${HEADERS}]])
+target_link_libraries(${PROJECT_NAME} comctl32)
