@@ -1,3 +1,8 @@
+extern "C"
+{
+#include <Windows.h>
+}
+
 #include "IGuard.hpp"
 
 // https://learn.microsoft.com/ru-ru/windows/win32/shell/csidl
@@ -8,5 +13,13 @@
 class AutoStartFolderGuard final : public IGuard
 {
 public:
-    AutoStartFolderGuard() = default;
+    AutoStartFolderGuard();
+    void compareState() override;
+
+private:
+    void init();
+
+private:
+    PWSTR m_userAutoStartFolderPath {nullptr};
+    PWSTR m_allAutoStartFolderPath {nullptr};
 };

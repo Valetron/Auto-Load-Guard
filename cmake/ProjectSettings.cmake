@@ -27,7 +27,7 @@ endif()
 # NOTE: нужен ли на MSVC?
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-#add_compile_definitions(UNICODE) # TODO: хочу ли я использовать функции с W окончанием
+add_compile_definitions(UNICODE)
 
 
 if (MSVC)
@@ -35,7 +35,7 @@ if (MSVC)
     add_compile_options(
 #        /W4            # NOTE: это или Wall?
         /Wall
-        /fsanitize
+#        /fsanitize     # FIXME: cl : Command line warning D9002 : ignoring unknown option '/fsanitize'
         /MP             # TODO: проверить с и без. Должен сократить время компиляции
     )
 else() # TODO: подумать над clang, mingw

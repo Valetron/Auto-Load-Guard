@@ -7,8 +7,11 @@ project(Auto-Load-Guard LANGUAGES CXX)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(ProjectSettings)
+include_directories(logic/guardian/)
 
-#file(GLOB SOURCES "*.cpp")
-#file(GLOB HEADERS "*.hpp")
+file(GLOB_RECURSE SOURCES "*.cpp")
+file(GLOB_RECURSE HEADERS "*.hpp")
 
-add_executable(${PROJECT_NAME} main.cpp #[[${SOURCES} ${HEADERS}]])
+message(STATUS "====== ${HEADERS}")
+
+add_executable(${PROJECT_NAME} main.cpp ${SOURCES} ${HEADERS})
