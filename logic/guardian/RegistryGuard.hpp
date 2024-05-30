@@ -1,12 +1,22 @@
+#include <winnt.h>
+
 #include "IGuard.hpp"
 
-// https://learn.microsoft.com/ru-ru/windows/win32/shell/csidl
-// https://learn.microsoft.com/ru-ru/windows/win32/api/shlobj_core/nf-shlobj_core-shgetknownfolderpath
-// user folder - C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
-// all folder - C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp
+// https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regnotifychangekeyvalue
+// https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys
 
 class RegistryGuard final : public IGuard
 {
 public:
-    AutoStartFolderGuard() = default;
+    RegistryGuard() = default;
+    void compareState() override;
+
+private:
+    void init();
+
+private:
+    constexpr DWORD M_NOTIFY_FILTER_FLAGS = REG_NOTIFY_CHANGE_NAME
+                                            | REG_NOTIFY_CHANGE_ATTRIBUTES
+                                            | REG_NOTIFY_CHANGE_LAST_SET
+                                            | REG_NOTIFY_CHANGE_SECURITY;
 };
