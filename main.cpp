@@ -5,5 +5,6 @@
 int main(void)
 {
     AutoStartFolderGuard a;
+    a.run();
     return 0;
 }

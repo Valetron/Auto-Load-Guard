@@ -1,7 +1,6 @@
-extern "C"
-{
-#include <Windows.h>
-}
+#include <string>
+#include <filesystem>
+#include <unordered_map>
 
 #include "IGuard.hpp"
 
@@ -10,16 +9,20 @@ extern "C"
 // user folder - C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
 // all folder - C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp
 
+namespace fs = std::filesystem;
+
 class AutoStartFolderGuard final : public IGuard
 {
 public:
     AutoStartFolderGuard();
     void compareState() override;
+    void run() override;
 
 private:
     void init();
 
 private:
-    PWSTR m_userAutoStartFolderPath {nullptr};
-    PWSTR m_allAutoStartFolderPath {nullptr};
+    fs::path m_userAutoStartFolderPath;
+    fs::path m_allAutoStartFolderPath;
+    std::unordered_map<std::wstring, std::wstring> m_filePath;
 };
