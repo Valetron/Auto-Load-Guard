@@ -1,80 +1,63 @@
-#include <windows.h>
-#include <tchar.h>
-#include <stdio.h>
+#include <Windows.h>
+#include <iostream>
 
-//void main(int argc, char *argv[])
-void __cdecl _tmain(int argc, TCHAR *argv[])
+void MonitorRegistryKey(HKEY hKey, LPCTSTR lpSubKey)
 {
-    DWORD  dwFilter = REG_NOTIFY_CHANGE_NAME |
+    DWORD dwFilter = REG_NOTIFY_CHANGE_NAME |
                      REG_NOTIFY_CHANGE_ATTRIBUTES |
                      REG_NOTIFY_CHANGE_LAST_SET |
                      REG_NOTIFY_CHANGE_SECURITY;
-
     HANDLE hEvent;
-    HKEY   hMainKey = HKEY_CURRENT_USER;
-    HKEY   hKey;
-    LONG   lErrorCode;
+    LONG lResult;
 
-    // Display the usage error message.
-//    if (argc != 3)
-//    {
-//        _tprintf(TEXT("Usage: notify [HKLM|HKU|HKCU|HKCR|HCC] [<subkey>]\n"));
-//        return;
-//    }
-
-    // Open a key.
-    lErrorCode = RegOpenKeyEx(hMainKey, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_NOTIFY, &hKey);
-    if (lErrorCode != ERROR_SUCCESS)
-    {
-        _tprintf(TEXT("Error in RegOpenKeyEx (%d).\n"), lErrorCode);
-        return;
-    }
-
-    // Create an event.
     hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (hEvent == NULL)
     {
-        _tprintf(TEXT("Error in CreateEvent (%d).\n"), GetLastError());
+        std::cerr << "Error creating event" << std::endl;
         return;
     }
 
-    // Watch the registry key for a change of value.
-    lErrorCode = RegNotifyChangeKeyValue(hKey,
-                                         TRUE,
-                                         dwFilter,
-                                         hEvent,
-                                         TRUE);
-    if (lErrorCode != ERROR_SUCCESS)
+    lResult = RegNotifyChangeKeyValue(hKey, TRUE, dwFilter, hEvent, TRUE);
+    if (lResult != ERROR_SUCCESS)
     {
-        _tprintf(TEXT("Error in RegNotifyChangeKeyValue (%d).\n"), lErrorCode);
+        std::cerr << "Error setting up registry key notification" << std::endl;
         return;
     }
 
-    // Wait for an event to occur.
-    _tprintf(TEXT("Waiting for a change in the specified key...\n"));
-    if (WaitForSingleObject(hEvent, INFINITE) == WAIT_FAILED)
+    while (true)
     {
-        _tprintf(TEXT("Error in WaitForSingleObject (%d).\n"), GetLastError());
-        return;
-    }
-    else
-    {
-        MessageBox(nullptr, "Change occured", "Title", MB_ICONWARNING | MB_YESNO | MB_SETFOREGROUND);
-//        _tprintf(TEXT("\nChange has occurred.\n"));
+        if (WaitForSingleObject(hEvent, INFINITE) == WAIT_OBJECT_0)
+        {
+            std::cout << "Registry key has changed" << std::endl;
+
+            // Re-enable notification for next change
+            lResult = RegNotifyChangeKeyValue(hKey, TRUE, dwFilter, hEvent, TRUE);
+            if (lResult != ERROR_SUCCESS)
+            {
+                std::cerr << "Error setting up registry key notification" << std::endl;
+                return;
+            }
+        }
     }
 
-    // Close the key.
-    lErrorCode = RegCloseKey(hKey);
-    if (lErrorCode != ERROR_SUCCESS)
+    CloseHandle(hEvent);
+}
+
+int main()
+{
+    HKEY hKey;
+    LONG lResult;
+
+    lResult = RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_NOTIFY, &hKey);
+    if (lResult != ERROR_SUCCESS)
     {
-        _tprintf(TEXT("Error in RegCloseKey (%d).\n"), GetLastError());
-        return;
+        std::cerr << "Error opening registry key" << std::endl;
+        return 1;
     }
 
-    // Close the handle.
-    if (!CloseHandle(hEvent))
-    {
-        _tprintf(TEXT("Error in CloseHandle.\n"));
-        return;
-    }
+    MonitorRegistryKey(hKey, TEXT("MyApp"));
+
+    RegCloseKey(hKey);
+
+    return 0;
 }
